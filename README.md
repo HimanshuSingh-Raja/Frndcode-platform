@@ -1,19 +1,37 @@
 # FrndCode 🚀
 
-Real-time coding platform for teachers and students.
+FrndCode is a real-time coding platform designed for students and teachers to make coding practice interactive, engaging, and fun.
 
-## Features
+## 🌟 Features
+
 - Live Coding Challenges
 - Teacher Dashboard
 - Student Dashboard
-- Analytics
+- Analytics & Progress Tracking
 - Practice Mode
+- Beginner-Friendly Interface
 
-## Tech Stack
+## 🛠 Tech Stack
+
 - Next.js
-- TypeScript
 - React
+- TypeScript
 - Tailwind CSS
 
-## Author
+## 🌐 Live Demo
+
+https://frndcode-platform.onrender.com
+
+## 📸 Screenshots
+
+(Add screenshots here later)
+
+## 🎯 Vision
+
+FrndCode aims to help teachers conduct real-time coding sessions and help students learn coding through practice, challenges, and progress tracking.
+
+## 👨‍💻 Author
+
 Himanshu Singh
+
+GitHub: https://github.com/HimanshuSingh-Raja

@@ -12,7 +12,9 @@ import { Logo } from "@/components/logo"
 import { loginAsTeacher, loginAsStudent } from "@/lib/store"
 import { GraduationCap, BookOpen, ArrowRight } from "lucide-react"
 import { signInWithEmailAndPassword } from "firebase/auth"
-import { auth } from "@/lib/firebase"
+import { auth, db } from "@/lib/firebase"
+import { doc, getDoc } from "firebase/firestore"
+
 
 export default function LoginPage() {
   const router = useRouter()
@@ -20,16 +22,32 @@ export default function LoginPage() {
   const defaultRole = searchParams.get("role") || "teacher"
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
+  const [teacherUID, setTeacherUID] = useState("")
   const [password, setPassword] = useState("") 
   const handleFirebaseLogin = async (role: "teacher" | "student") => {
   try {
     setIsLoading(true)
 
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    )
+    let loginEmail = email
+
+  if (role === "teacher") {
+  const teacherDoc = await getDoc(
+    doc(db, "Teachers", teacherUID)
+  )
+
+  if (!teacherDoc.exists()) {
+    alert("Teacher UID not found")
+    return
+  }
+
+  loginEmail = teacherDoc.data().email
+}
+
+const userCredential = await signInWithEmailAndPassword(
+  auth,
+  loginEmail,
+  password
+)
 
     console.log("Logged in:", userCredential.user.email)
 
@@ -121,14 +139,14 @@ export default function LoginPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="teacher-email">Email</Label>
-                    <Input id="teacher-email" type="email" placeholder="teacher@university.edu" />
+                    <Label htmlFor="teacher-uid">Teacher UID</Label>
+                    <Input id="teacher-uid" type="text" placeholder="Teacher UID" value={teacherUID} onChange={(e) => setTeacherUID(e.target.value)}/>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="teacher-password">Password</Label>
-                    <Input id="teacher-password" type="password" placeholder="Enter your password" />
+                    <Input id="teacher-password" type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                   </div>
-                  <Button className="w-full gap-2" onClick={() => handleDemoLogin("teacher")} disabled={isLoading}>
+                  <Button className="w-full gap-2" onClick={() => handleFirebaseLogin("teacher")} disabled={isLoading}>
                     {isLoading ? "Signing in..." : "Sign In as Teacher"}
                     <ArrowRight className="size-4" />
                   </Button>
@@ -140,9 +158,9 @@ export default function LoginPage() {
                       <span className="bg-card px-2 text-muted-foreground">Or</span>
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full bg-transparent" onClick={() => handleDemoLogin("teacher")} disabled={isLoading}>
+                  {/* <Button variant="outline" className="w-full bg-transparent" onClick={() => handleDemoLogin("teacher")} disabled={isLoading}>
                     Try Demo Account
-                  </Button>
+                  </Button> */}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -177,9 +195,9 @@ export default function LoginPage() {
                       <span className="bg-card px-2 text-muted-foreground">Or</span>
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full bg-transparent" onClick={() => handleFirebaseLogin("student")} disabled={isLoading}>
+                  {/* <Button variant="outline" className="w-full bg-transparent" onClick={() => handleFirebaseLogin("student")} disabled={isLoading}>
                     Try Demo Account
-                  </Button>
+                  </Button> */}
                 </CardContent>
               </Card>
             </TabsContent>

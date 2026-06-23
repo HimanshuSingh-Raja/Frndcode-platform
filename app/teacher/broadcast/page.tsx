@@ -1,5 +1,8 @@
 "use client"
 
+import { doc, setDoc, updateDoc } from "firebase/firestore"
+import { db } from "@/lib/firebase"
+
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -51,27 +54,43 @@ function BroadcastContent() {
     }
   }, [isLive, timeRemaining, setActiveSession])
 
-  const startBroadcast = () => {
-    if (!question) return
-    setIsLive(true)
-    setTimeRemaining(question.timeLimit)
-    setParticipants(mockStudents.map((s) => s.id))
-    setActiveSession({
-      id: `session-${Date.now()}`,
-      questionId: question.id,
-      teacherId: "teacher-1",
-      startedAt: new Date(),
-      endsAt: new Date(Date.now() + question.timeLimit * 1000),
-      status: "active",
-      participants: mockStudents.map((s) => s.id),
-    })
-  }
+  const startBroadcast = async () => {
+  if (!question) return
 
-  const stopBroadcast = () => {
-    setIsLive(false)
-    setTimeRemaining(0)
-    setActiveSession(null)
+ await setDoc(
+  doc(db, "liveSession", "current"),
+  {
+    questionId: question.id,
+    title: question.title,
+    description: question.description,
+    difficulty: question.difficulty,
+
+    starterCode: question.starterCode,
+    timeLimit: question.timeLimit,
+    testCases: question.testCases,
+
+    isLive: true,
+    startedAt: new Date().toISOString(),
   }
+)
+
+  setIsLive(true)
+  setTimeRemaining(question.timeLimit)
+  setParticipants(mockStudents.map((s) => s.id))
+}
+
+
+  const stopBroadcast = async () => {
+  await updateDoc(
+    doc(db, "liveSession", "current"),
+    {
+      isLive: false,
+    }
+  )
+
+  setIsLive(false)
+  setTimeRemaining(0)
+}
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)

@@ -1,5 +1,8 @@
 "use client"
 
+import { doc, onSnapshot } from "firebase/firestore"
+import { db } from "@/lib/firebase"
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -29,10 +32,24 @@ export default function LiveSessionPage() {
   const { activeSession, setActiveSession } = useAppStore()
   
   // Simulate an active session for demo
-  const [session, setSession] = useState(mockLiveSession)
+  const [session, setSession] = useState<any>(null)
+
+  useEffect(() => {
+  const unsubscribe = onSnapshot(
+    doc(db, "liveSession", "current"),
+    (snap) => {
+      if (snap.exists()) {
+        setSession(snap.data())
+      }
+    }
+  )
+
+  return () => unsubscribe()
+}, [])
+
   const [isSessionActive, setIsSessionActive] = useState(true)
   
-  const question = mockQuestions.find((q) => q.id === session?.questionId)
+  const question = session
   const [code, setCode] = useState(question?.starterCode || "")
   const [isRunning, setIsRunning] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)

@@ -20,6 +20,9 @@ import { ArrowLeft, Plus, Trash2, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import type { TestCase } from "@/lib/types"
 
+import { db } from "@/lib/firebase"
+import { collection, addDoc } from "firebase/firestore"
+
 export default function NewQuestionPage() {
   const router = useRouter()
   const { addQuestion } = useAppStore()
@@ -62,23 +65,27 @@ export default function NewQuestionPage() {
     setTags(tags.filter((t) => t !== tag))
   }
 
-  const handleSubmit = () => {
-    const newQuestion = {
-      id: `q-${Date.now()}`,
-      title,
-      description,
-      difficulty,
-      timeLimit: timeLimit * 60,
-      testCases,
-      starterCode,
-      tags,
-      createdBy: "teacher-1",
-      createdAt: new Date(),
-    }
-    addQuestion(newQuestion)
-    router.push("/teacher/questions")
-  }
+  const handleSubmit = async () => {
+    
+  const newQuestion = {
+  id: `q-${Date.now()}`,
+  title,
+  description,
+  difficulty,
+  timeLimit: timeLimit * 60,
+  testCases,
+  starterCode,
+  tags,
+  createdBy: "teacher-1",
+  createdAt: new Date(),
+}
 
+await addDoc(collection(db, "questions"), newQuestion)
+
+addQuestion(newQuestion)
+
+router.push("/teacher/questions")
+}
   return (
     <div className="p-6 lg:p-8">
       {/* Header */}

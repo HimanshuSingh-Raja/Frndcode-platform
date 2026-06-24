@@ -25,7 +25,7 @@ import {
   Clock,
   RefreshCw,
 } from "lucide-react"
-import type { TestResult } from "@/lib/types"
+import type { TestCase, TestResult } from "@/lib/types"
 
 export default function LiveSessionPage() {
   const router = useRouter()
@@ -66,8 +66,8 @@ export default function LiveSessionPage() {
 
     // Mock test results
     const results: TestResult[] = question?.testCases
-      .filter((tc) => !tc.isHidden)
-      .map((tc) => ({
+      .filter((tc: TestCase) => !tc.isHidden)
+      .map((tc: TestCase) => ({
         testCaseId: tc.id,
         passed: Math.random() > 0.3,
         executionTime: Math.floor(Math.random() * 10) + 1,
@@ -87,7 +87,7 @@ export default function LiveSessionPage() {
 
     // Mock all test results
     const allPassed = Math.random() > 0.4
-    const results: TestResult[] = question?.testCases.map((tc) => ({
+    const results: TestResult[] = question?.testCases.map((tc: TestCase) => ({
       testCaseId: tc.id,
       passed: allPassed || Math.random() > 0.5,
       executionTime: Math.floor(Math.random() * 10) + 1,
@@ -200,7 +200,7 @@ export default function LiveSessionPage() {
             <CodeEditor
               value={code}
               onChange={setCode}
-              language="javascript"
+              language="cpp"
               readOnly={hasSubmitted}
               className="h-full"
             />
